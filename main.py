@@ -3,7 +3,7 @@ import pprint
 from pymongo import mongo_client, MongoClient
 import mysql.connector
 
-cnx = mysql.connector.connect(user='root', password='nhy6NHY^',
+cnx = mysql.connector.connect(user='root', password='',
                                   host='127.0.0.1',
                                   database = 'TEST_DB')
 def connectMySql():
@@ -21,7 +21,7 @@ def createTableInMySQL(tableName, columns):
              col = col + "_"
          command = command[:len(command)] + col + " varchar(500),"
 
-    command = command[:len(command) - 1] + ")"
+    command = command[:len(command) - 1] + ") CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ;"
     print(command)
 
     cursor.execute(command)
@@ -30,9 +30,10 @@ def createTableInMySQL(tableName, columns):
 def alterTableInMySQL(tableName, columns):
     cursor = cnx.cursor()
     for col in columns:
-        command = "ALTER TABLE " + tableName + " ADD COLUMN " + col + " varchar(50);"
+        command = "ALTER TABLE " + tableName + " ADD COLUMN " + col + " varchar(500);"
         cursor.execute(command)
         cnx.commit()
+
 def insertRecordIntoTable(tableName, rowData, columns):
     cursor = cnx.cursor()
     command = "INSERT INTO " + tableName + "( "
@@ -44,12 +45,14 @@ def insertRecordIntoTable(tableName, rowData, columns):
 
     for data in rowData:
         print(data)
-        command = command[:len(command)]  +"\""+ str(data) + "\","
+        data=str(data).replace('"','\\"')
+        command = command[:len(command)]  +'"'+ str(data) + '",'
     command = command[: len(command) - 1] + ")"
     print(command)
     cursor.execute(command)
     cnx.commit()
-    print(command)
+    #print(command)
+
 def readMongo():
     client = MongoClient()
     dbs = client.list_database_names()
@@ -111,9 +114,8 @@ def iterateMongo():
 
 
 if __name__ == '__main__':
-    #connectMongo()
-    #connectMySql()
-    readMongo()
+    iterateMongo()
+    #readMongo()
 
 
 
