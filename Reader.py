@@ -1,13 +1,12 @@
-from asyncio.windows_events import NULL
 import pprint
 from Parser import Parser
 from pymongo import mongo_client, MongoClient
 
 
 class Reader:
-    def __init__(self,input_database,output_database):
+    def __init__(self, input_database, output_database, db_username, db_password, db_host):
         self.client = MongoClient()
-        self.parser= Parser(output_database)
+        self.parser= Parser(output_database, db_username, db_password, db_host)
         self.database_name=input_database
         return None
 

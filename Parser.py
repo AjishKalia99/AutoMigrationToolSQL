@@ -2,8 +2,8 @@ from pickle import FALSE
 from Writer import Writer
 
 class Parser:
-    def __init__(self,output_database):
-        self.Writer=Writer(output_database)
+    def __init__(self,output_database, db_username, db_password, db_host):
+        self.Writer=Writer(output_database, db_username, db_password, db_host)
         return None
 
     def parse_nesting(self,parent_collection,parent_id,collection_name,collection_data):
@@ -20,6 +20,7 @@ class Parser:
                 col_names.append(parent_collection+"_id")
                 col_names.append(collection_name)
                 self.Writer.create_table(collection_name+"_"+parent_collection+"_mapping",col_names)
+
             for document in collection_data:
                 if(self.Writer.checkTableExists(collection_name) == False):
                     print("Table "+collection_name+" does not exist. Will be created according to first document!")
@@ -27,7 +28,12 @@ class Parser:
                     for key in document:
                         if(type(document[key])!=list):
                             col_names.append(key)
-                    self.Writer.create_table(collection_name,col_names)
+                    col_names.append(parent_collection+"_id")  #add column to save foreign key 
+                    self.Writer.create_table(collection_name,col_names)  
+                    self.Writer.create_fk_constraint(collection_name,collection_name+"_"+parent_collection,parent_collection,parent_collection+"_id")
+                    #self.Writer.create_fk_constraint(collection_name,collection_name+"_"+parent_collection,collection_name+"_"+parent_collection+"_mapping",collection_name+"_"+parent_collection+"_mapping_ingredients")
+                    #self.Writer.create_fk_constraint(collection_name,collection_name+"_"+parent_collection,collection_name+"_"+parent_collection+"_mapping",collection_name+"_"+parent_collection+"_mapping_"+parent_collection+"_id")
+
                 else:
                     columns=self.Writer.get_columns(collection_name)
                     col_names=[]

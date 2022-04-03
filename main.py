@@ -1,4 +1,6 @@
+from cgi import test
 import pprint
+from typing_extensions import Self
 
 from pymongo import mongo_client, MongoClient
 import mysql.connector
@@ -6,8 +8,8 @@ import mysql.connector
 cnx = mysql.connector.connect(user='root', password='',
                                   host='127.0.0.1',
                                   database = 'TEST_DB')
-def connectMySql():
 
+def connectMySql():
     cursor = cnx.cursor()
     cursor.execute('Create Database TEST_DB2')
     cnx.commit()
