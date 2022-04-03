@@ -2,12 +2,11 @@ import collections
 import mysql.connector
 
 class Writer:
-    def __init__(self,database_name):
-        self.connection=mysql.connector.connect(user='root', password='',
-                                  host='127.0.0.1',
+    def __init__(self,database_name, db_username, db_password, db_host):
+        self.connection=mysql.connector.connect(user=db_username, password=db_password,
+                                  host=db_host,
                                   database = database_name)
         
-
     def checkTableExists(self, tablename):
         cursor = self.connection.cursor()
         cursor.execute("""
@@ -25,7 +24,7 @@ class Writer:
         cursor = self.connection.cursor()
         command = "create table if not exists " + tablename + "( "+ tablename +"_id int primary key auto_increment ,"
         for col in columns:
-            command = command + tablename+"_"+col + " varchar(500),"
+           command = command + tablename+"_"+col + " varchar(500),"
         command = command[:len(command)-1] + ") CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ;"
         print("Table "+tablename+" created succesfully")
         cursor.execute(command)
@@ -48,10 +47,17 @@ class Writer:
 
     def create_fk_constraint(self,constraint_table,constraint_from,constraint_to,constraint_collection):
         cursor = self.connection.cursor()
-        print("Adding Foreign key constraints")
+        print("Adding Foreign key constraints to table: "+constraint_table)
         command="ALTER TABLE "+constraint_table+" MODIFY "+constraint_from+"_id INTEGER;"
         cursor.execute(command)
         command="ALTER TABLE "+constraint_table+" ADD FOREIGN KEY ("+constraint_from+"_id) REFERENCES "+constraint_to+"("+constraint_collection+");"
+        
+        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+        print(command)
+        print(constraint_table)
+        print(constraint_from)
+        print(constraint_to)
+        print(constraint_collection)
         cursor.execute(command)
         self.connection.commit()
         print("Added Foreign key constraints")
