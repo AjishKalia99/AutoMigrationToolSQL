@@ -1,4 +1,3 @@
-from pickle import FALSE
 from Writer import Writer
 
 class Parser:
@@ -18,9 +17,8 @@ class Parser:
                 print("Table "+collection_name+"_"+parent_collection+"_mapping"+" does not exist. Will be created.")
                 col_names=[]
                 col_names.append(parent_collection+"_id")
-                col_names.append(collection_name)
+                col_names.append(collection_name+"_id")
                 self.Writer.create_table(collection_name+"_"+parent_collection+"_mapping",col_names)
-
             for document in collection_data:
                 if(self.Writer.checkTableExists(collection_name) == False):
                     print("Table "+collection_name+" does not exist. Will be created according to first document!")
@@ -30,10 +28,10 @@ class Parser:
                             col_names.append(key)
                     col_names.append(parent_collection+"_id")  #add column to save foreign key 
                     self.Writer.create_table(collection_name,col_names)  
-                    self.Writer.create_fk_constraint(collection_name,collection_name+"_"+parent_collection,parent_collection,parent_collection+"_id")
-                    #self.Writer.create_fk_constraint(collection_name,collection_name+"_"+parent_collection,collection_name+"_"+parent_collection+"_mapping",collection_name+"_"+parent_collection+"_mapping_ingredients")
-                    #self.Writer.create_fk_constraint(collection_name,collection_name+"_"+parent_collection,collection_name+"_"+parent_collection+"_mapping",collection_name+"_"+parent_collection+"_mapping_"+parent_collection+"_id")
-
+                    #self.Writer.create_fk_constraint(collection_name,collection_name,collection_name+"_"+parent_collection+"_mapping",collection_name+"_"+parent_collection+"_mapping_"+collection_name)
+                    #self.Writer.create_fk_constraint(parent_collection,parent_collection,collection_name+"_"+parent_collection+"_mapping",collection_name+"_"+parent_collection+"_mapping_"+parent_collection+"_id")
+                    self.Writer.create_fk_constraint_mapping(collection_name+"_"+parent_collection+"_mapping",collection_name+"_"+parent_collection+"_mapping_"+collection_name,collection_name,collection_name+"_id")
+                    self.Writer.create_fk_constraint_mapping(collection_name+"_"+parent_collection+"_mapping",collection_name+"_"+parent_collection+"_mapping_"+parent_collection,parent_collection,parent_collection+"_id") 
                 else:
                     columns=self.Writer.get_columns(collection_name)
                     col_names=[]
@@ -52,9 +50,11 @@ class Parser:
                         columns.append(collection_name+"_"+key)
                         values.append(document[key])
                 row_id=self.Writer.insertRecordIntoTable(collection_name,values,columns)
+                #print(parent_id)
+                #print(parent_collection)
                 for value in collection_data:
                     self.Writer.insertRecordIntoTable(collection_name+"_"+parent_collection+"_mapping",[parent_id,row_id],
-                    [collection_name+"_"+parent_collection+"_mapping"+"_"+parent_collection+"_id",collection_name+"_"+parent_collection+"_mapping"+"_"+collection_name])                
+                    [collection_name+"_"+parent_collection+"_mapping"+"_"+parent_collection+"_id",collection_name+"_"+parent_collection+"_mapping"+"_"+collection_name+"_id"])                
         else:
             print("Key "+collection_name+" has no nesting. Creating a mapping Table")
             if(self.Writer.checkTableExists(collection_name) == False):

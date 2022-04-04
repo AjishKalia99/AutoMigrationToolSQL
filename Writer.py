@@ -1,4 +1,3 @@
-import collections
 import mysql.connector
 
 class Writer:
@@ -26,6 +25,7 @@ class Writer:
         for col in columns:
            command = command + tablename+"_"+col + " varchar(500),"
         command = command[:len(command)-1] + ") CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ;"
+        #print(command)
         print("Table "+tablename+" created succesfully")
         cursor.execute(command)
         cursor.close()
@@ -50,14 +50,22 @@ class Writer:
         print("Adding Foreign key constraints to table: "+constraint_table)
         command="ALTER TABLE "+constraint_table+" MODIFY "+constraint_from+"_id INTEGER;"
         cursor.execute(command)
+        #command="ALTER TABLE "+constraint_to+" MODIFY "+constraint_collection+" INTEGER;"
+        #cursor.execute(command)
         command="ALTER TABLE "+constraint_table+" ADD FOREIGN KEY ("+constraint_from+"_id) REFERENCES "+constraint_to+"("+constraint_collection+");"
-        
-        print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-        print(command)
-        print(constraint_table)
-        print(constraint_from)
-        print(constraint_to)
-        print(constraint_collection)
+        #print(command)
+        cursor.execute(command)
+        self.connection.commit()
+        print("Added Foreign key constraints")
+
+    def create_fk_constraint_mapping(self,constraint_table,constraint_from,constraint_to,constraint_collection):
+        cursor = self.connection.cursor()
+        print("Adding Foreign key constraints to table: "+constraint_table)
+        command="ALTER TABLE "+constraint_table+" MODIFY "+constraint_from+"_id INTEGER;"
+        cursor.execute(command)
+        #command="ALTER TABLE "+constraint_to+" MODIFY "+constraint_collection+" INTEGER;"
+        #cursor.execute(command)
+        command="ALTER TABLE "+constraint_table+" ADD FOREIGN KEY ("+constraint_from+"_id) REFERENCES "+constraint_to+"("+constraint_collection+");"
         cursor.execute(command)
         self.connection.commit()
         print("Added Foreign key constraints")
@@ -75,6 +83,7 @@ class Writer:
             command = command[:len(command)]  +'"'+ str(data) + '",'
         command = command[: len(command) - 1] + ")"
         print("Added Data to Table "+tableName)
+        #print(command)
         cursor.execute(command)
         self.connection.commit()
         last_row=cursor.lastrowid
