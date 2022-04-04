@@ -26,5 +26,5 @@ Running the tool is as simple as running
 ```
 python3 index.py
 ```
-
+in the installation directory.
 Once the execution of the application completes, you can go the MySQL database and see the added tables and data
