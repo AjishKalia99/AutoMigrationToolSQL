@@ -5,14 +5,15 @@ class Writer:
         self.connection=mysql.connector.connect(user=db_username, password=db_password,
                                   host=db_host,
                                   database = database_name)
-        
+        self.database_name=database_name
+
     def checkTableExists(self, tablename):
         cursor = self.connection.cursor()
         cursor.execute("""
             SELECT COUNT(*)
             FROM information_schema.tables
-            WHERE table_name = '{0}'
-            """.format(tablename.replace('\'', '\'\'')))
+            WHERE TABLE_SCHEMA='{1}' AND table_name = '{0}'
+            """.format(tablename.replace('\'', '\'\''),self.database_name.replace('\'', '\'\'')))
         if cursor.fetchone()[0] == 1:
             cursor.close()
             return True
